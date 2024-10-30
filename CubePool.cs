@@ -1,43 +1,33 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Pool;
 
 public class CubePool : MonoBehaviour
 {
     private readonly int _poolCapacity = 5;
-    private readonly int _poolMaxSize = 5;
+    private readonly int _poolMaxSize = 10;
 
-    private ObjectPool<GameObject> _pool;
+    private ObjectPool<FallingCube> _pool;
 
-    public void Initialize(GameObject cube)
+    public void Initialize(FallingCube cube)
     {
-        _pool = new ObjectPool<GameObject>(
-        createFunc: () => Instantiate(cube),
-        actionOnGet: (obj) => ActionOnGet(obj),
-        actionOnRelease: (obj) => obj.SetActive(false),
-        actionOnDestroy: (obj) => Destroy(obj),
-        collectionCheck: true,
-        defaultCapacity: _poolCapacity,
-        maxSize: _poolMaxSize);
+        _pool = new ObjectPool<FallingCube>(
+            createFunc: () => Instantiate(cube),
+            actionOnGet: (cube) => GetAction(cube),
+            actionOnRelease: (cube) => cube.gameObject.SetActive(false),
+            actionOnDestroy: (cube) => Destroy(cube.gameObject),
+            collectionCheck: true,
+            defaultCapacity: _poolCapacity,
+            maxSize: _poolMaxSize);
     }
 
-    public void GetCube()
+    public void GetCube(Vector3 position)
     {
-        _pool.Get();
+        FallingCube cube = _pool.Get();
+        cube.transform.position = position;
     }
 
-    private void ActionOnGet(GameObject obj)
+    private void GetAction(FallingCube cube)
     {
-        obj.transform.position = GetStarterPoint();
-        obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        obj.SetActive(true);
-    }
-
-    private Vector3 GetStarterPoint()
-    {
-        float height = 8f;
-        float minValue = -7.0f;
-        float maxValue = 7.0f;
-
-        return new Vector3(Random.Range(minValue, maxValue), height, Random.Range(minValue, maxValue));
+        cube.gameObject.SetActive(true);
     }
 }
