@@ -7,6 +7,7 @@ public class CubeSpawner : MonoBehaviour
 
     private CubePool _cubePool;
     private readonly float _repeatRate = 1.0f;
+    private bool _isSpawning = true;
 
     private void Awake()
     {
@@ -21,7 +22,7 @@ public class CubeSpawner : MonoBehaviour
 
     private IEnumerator SpawnCubes()
     {
-        while (true)
+        while (_isSpawning)
         {
             Vector3 spawnPosition = GetStarterPoint();
             _cubePool.GetCube(spawnPosition);
