@@ -15,7 +15,7 @@ public class FallingCube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_hasCollided == false && collision.gameObject.TryGetComponent<Platform>(out var platform))
+        if (_hasCollided == false && collision.gameObject.TryGetComponent<Platform>(out _))
         {
             _renderer.material.color = new Color(Random.value, Random.value, Random.value);
             _hasCollided = true;
