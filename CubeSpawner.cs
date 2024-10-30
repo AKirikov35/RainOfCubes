@@ -1,61 +1,40 @@
+using System.Collections;
 using UnityEngine;
 
 public class CubeSpawner : MonoBehaviour
 {
-    [SerializeField] private Mesh _cubeMesh;
-    [SerializeField] private Material _cubeMaterial;
-    [SerializeField] private Platform[] _platforms;
-
-    private CubeCreator _cubeCreator;
+    [SerializeField] private FallingCube _prefab;
 
     private CubePool _cubePool;
     private readonly float _repeatRate = 1.0f;
 
     private void Awake()
     {
-        _cubeCreator = new CubeCreator(_cubeMesh, _cubeMaterial);
         _cubePool = gameObject.AddComponent<CubePool>();
-        _cubePool.Initialize(_cubeCreator.Create());
+        _cubePool.Initialize(_prefab);
     }
 
     private void Start()
     {
-        InvokeRepeating(nameof(InvokeGetCube), 0.0f, _repeatRate);
+        StartCoroutine(SpawnCubes());
     }
 
-    private void OnEnable()
+    private IEnumerator SpawnCubes()
     {
-        foreach (var platform in _platforms)
-            if (platform != null)
-                platform.WasCollision += Collision;
+        while (true)
+        {
+            Vector3 spawnPosition = GetStarterPoint();
+            _cubePool.GetCube(spawnPosition);
+            yield return new WaitForSeconds(_repeatRate);
+        }
     }
 
-    private void OnDisable()
+    private Vector3 GetStarterPoint()
     {
-        foreach (var platform in _platforms)
-            if (platform != null)
-                platform.WasCollision -= Collision;
-    }
+        float height = 8f;
+        float minValue = -7.0f;
+        float maxValue = 7.0f;
 
-    private void InvokeGetCube()
-    {
-        _cubePool.GetCube();
-    }
-
-    private void Collision(GameObject cube)
-    {
-        if (cube == null) 
-            return;
-
-        float delay = 5f;
-
-        GetColor(cube);
-        Destroy(cube, delay);
-    }
-
-    private void GetColor(GameObject cube)
-    {
-        if (cube.TryGetComponent<Renderer>(out var renderer))
-            renderer.material.color = new Color(Random.value, Random.value, Random.value);
+        return new Vector3(Random.Range(minValue, maxValue), height, Random.Range(minValue, maxValue));
     }
 }
