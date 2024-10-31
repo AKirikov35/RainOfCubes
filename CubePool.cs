@@ -13,7 +13,7 @@ public class CubePool : MonoBehaviour
         _pool = new ObjectPool<FallingCube>(
             createFunc: () => Instantiate(cube),
             actionOnGet: (cube) => GetAction(cube),
-            actionOnRelease: (cube) => cube.gameObject.SetActive(false),
+            actionOnRelease: (cube) => ReleaseAction(cube),
             actionOnDestroy: (cube) => Destroy(cube.gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
@@ -24,10 +24,22 @@ public class CubePool : MonoBehaviour
     {
         FallingCube cube = _pool.Get();
         cube.transform.position = position;
+        cube.Initialize(this);
+    }
+
+    public void ReturnToPool(FallingCube cube)
+    {
+        _pool.Release(cube);
     }
 
     private void GetAction(FallingCube cube)
     {
         cube.gameObject.SetActive(true);
+    }
+
+    private void ReleaseAction(FallingCube cube)
+    {
+        cube.gameObject.SetActive(false);
+        cube.Initialize(this);
     }
 }
