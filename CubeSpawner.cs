@@ -11,7 +11,7 @@ public class CubeSpawner : MonoBehaviour
 
     private void Awake()
     {
-        _cubePool = gameObject.AddComponent<CubePool>();
+        _cubePool = GetComponent<CubePool>();
         _cubePool.Initialize(_prefab);
     }
 
@@ -22,11 +22,13 @@ public class CubeSpawner : MonoBehaviour
 
     private IEnumerator SpawnCubes()
     {
+        WaitForSeconds waitForSeconds = new WaitForSeconds(_repeatRate);
+
         while (_isSpawning)
         {
             Vector3 spawnPosition = GetStarterPoint();
             _cubePool.GetCube(spawnPosition);
-            yield return new WaitForSeconds(_repeatRate);
+            yield return waitForSeconds;
         }
     }
 
